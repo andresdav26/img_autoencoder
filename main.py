@@ -5,8 +5,8 @@ from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 # tensorboard --logdir=runs
 
-from utils import Data
-from utils.DataFrame import DF 
+from utils import data
+from utils.dataframe import DF 
 from model import Autoencoder 
 
 import argparse
@@ -43,8 +43,8 @@ transform = {
             transforms.ToTensor(),
             ])}
 
-train_dataset = Data.MyDataset(DF(args.baseroot,'train'), transform['train'], use_cache=False)
-test_dataset = Data.MyDataset(DF(args.baseroot,'test'), transform['test'], use_cache=False)
+train_dataset = data.MyDataset(DF(args.baseroot,'train'), transform['train'], use_cache=False)
+test_dataset = data.MyDataset(DF(args.baseroot,'test'), transform['test'], use_cache=False)
 
 # data loader
 batch_size = 8

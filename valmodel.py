@@ -6,8 +6,8 @@ from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 
 from model import Autoencoder 
-from utils import Data
-from utils.DataFrame import DF 
+from utils import data
+from utils.dataframe import DF 
 
 import argparse
 import time
@@ -28,7 +28,7 @@ transform = transforms.Compose([
             transforms.Grayscale(num_output_channels=1), 
             transforms.ToTensor(),
             ])
-val_dataset = Data.MyDataset(DF(args.baseroot,'val'), transform, 'val', use_cache=False)
+val_dataset = data.MyDataset(DF(args.baseroot,'val'), transform, 'val', use_cache=False)
 valloader = DataLoader(val_dataset, batch_size=1)
 
 # Current Device 
