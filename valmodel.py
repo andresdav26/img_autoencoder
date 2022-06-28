@@ -25,7 +25,8 @@ args = parser.parse_args()
 
 # Load data 
 transform = transforms.Compose([
-            transforms.Grayscale(num_output_channels=1), 
+            transforms.Grayscale(num_output_channels=1),
+            # transforms.RandomCrop((40,40)), 
             transforms.ToTensor(),
             ])
 val_dataset = data.MyDataset(DF(args.baseroot,'val'), transform, 'val', use_cache=False)
@@ -58,6 +59,7 @@ with torch.no_grad():
 
             recon = recon.squeeze().cpu().numpy()
             imgN = imgN.squeeze().cpu().numpy()
-            result = cv2.hconcat((imgN, recon))
+            # result = cv2.hconcat((imgN, recon))
+            result = recon
             cv2.imwrite(args.output_path + 'img_' + str(i) + '.jpg', (result*255).astype('uint8'))
             print('Loss: {:.4f}, PSNR: {:,.2f}, time: {:,.2f}'.format(loss.item(), psnr, recon_time))
