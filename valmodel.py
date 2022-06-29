@@ -49,7 +49,7 @@ with torch.no_grad():
         for i, pair in enumerate(valloader):
             start_time = time.time()
             imgC, imgN = pair[0].to(device), pair[1].to(device)
-            recon = model(imgN)
+            recon = model(imgN,device)
             loss = criterion(recon,imgC)
             recon_time = time.time() - start_time
             
