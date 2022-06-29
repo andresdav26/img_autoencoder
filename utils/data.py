@@ -1,6 +1,4 @@
-from matplotlib import patches
 import torch
-import os
 from PIL import Image
 
 class MyDataset(torch.utils.data.Dataset):
@@ -14,7 +12,7 @@ class MyDataset(torch.utils.data.Dataset):
     def __getitem__(self, index):
         Image.MAX_IMAGE_PIXELS = None
         if not self.use_cache:
-            row = self.dataframe.iloc[index]  
+            row = self.dataframe.iloc[index] 
             imClean = self.transforms(Image.open(row['pClean']))
             imNoisy = self.transforms(Image.open(row['pNoisy'])) 
             # patches 
@@ -25,8 +23,9 @@ class MyDataset(torch.utils.data.Dataset):
                 imNoisy = imNoisy.resize_(1,imNoisy.shape[1]+imNoisy.shape[2],40,40)
                 for i in range(imClean.shape[1]): 
                     imC = imClean[:,i,:,:]
-                    imN = imNoisy[:,i,:,:]        
-                    self.cached_data.append((imC,imN))
+                    imN = imNoisy[:,i,:,:] 
+                    if (imN == 1.0).sum() < imN.size(1)**2:   # No guardar patches blancos!     
+                        self.cached_data.append((imC,imN))
             else:
                 self.cached_data.append((imClean,imNoisy))
                 return imClean,imNoisy

@@ -9,14 +9,15 @@
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/main.py",
-            "args": ["-r", "/home/adguerrero/gia_san/datasets/autoencoder/dataset/"],
+            "args": ["-r", "/home/adguerrero/ia_nas/datasets/autoencoder/dataset/",
+                    "-o", "./models/"],
         },
         {
             "name": "Evaluar",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/valmodel.py",
-            "args": ["-r", "/home/adguerrero/gia_san/datasets/autoencoder/dataset/",
+            "args": ["-r", "/home/adguerrero/ia_nas/datasets/autoencoder/dataset/",
                     "-o", "./results/"],
         }
     ]

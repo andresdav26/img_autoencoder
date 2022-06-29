@@ -34,7 +34,7 @@ transform = {
     'train': transforms.Compose([
             transforms.Grayscale(num_output_channels=1),
             # transforms.Resize((258,540)),
-            # transforms.RandomHorizontalFlip(),
+            transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             ]),
     'test': transforms.Compose([
@@ -48,10 +48,8 @@ test_dataset = data.MyDataset(DF(args.baseroot,'test'), transform['test'], use_c
 
 # data loader
 batch_size = 32
-trainloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=False, 
-            num_workers=0, drop_last=True)
-testloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, 
-            num_workers=0, drop_last=True)
+trainloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=False, num_workers=0)
+testloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=0)
 
 # DEFINE MODEL  
 model = Autoencoder().to(device)
@@ -62,7 +60,7 @@ tb = SummaryWriter()
 
 # MAIN LOOP 
 worst_loss = 1000
-num_epochs = 500
+num_epochs = 300
 for epoch in range(num_epochs):
     start_time = time.time()
     if epoch == 1:
