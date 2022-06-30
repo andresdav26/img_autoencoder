@@ -29,7 +29,7 @@ transform = transforms.Compose([
             # transforms.RandomCrop((40,40)), 
             transforms.ToTensor(),
             ])
-val_dataset = data.MyDataset(DF(args.baseroot,'val'), transform, 'val', use_cache=False)
+val_dataset = data.MyDataset(DF(args.baseroot,'val'), transform, use_cache=False)
 valloader = DataLoader(val_dataset, batch_size=1)
 
 # Current Device 
@@ -59,7 +59,7 @@ with torch.no_grad():
 
             recon = recon.squeeze().cpu().numpy()
             imgN = imgN.squeeze().cpu().numpy()
-            # result = cv2.hconcat((imgN, recon))
-            result = recon
+            result = cv2.hconcat((imgN, recon))
+            # result = recon
             cv2.imwrite(args.output_path + 'img_' + str(i) + '.jpg', (result*255).astype('uint8'))
             print('Loss: {:.4f}, PSNR: {:,.2f}, time: {:,.2f}'.format(loss.item(), psnr, recon_time))

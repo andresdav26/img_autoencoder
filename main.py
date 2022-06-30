@@ -49,7 +49,7 @@ train_dataset = data.MyDataset(DF(args.baseroot,'train'), transform['train'], us
 test_dataset = data.MyDataset(DF(args.baseroot,'test'), transform['test'], use_cache=False)
 
 # data loader
-batch_size = 64
+batch_size = 32
 trainloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=False, num_workers=0)
 testloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=0)
 
