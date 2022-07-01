@@ -1,14 +1,13 @@
 import torch
 import torch.nn as nn
-import torchvision
 from torchvision import transforms
 from torch.utils.data import DataLoader
-from torch.utils.tensorboard import SummaryWriter
 
 from model import Autoencoder 
 from utils import data
 from utils.dataframe import DF 
 
+from decimal import Decimal
 import argparse
 import time
 import cv2
@@ -26,14 +25,13 @@ args = parser.parse_args()
 # Load data 
 transform = transforms.Compose([
             transforms.Grayscale(num_output_channels=1),
-            # transforms.RandomCrop((40,40)), 
             transforms.ToTensor(),
             ])
 val_dataset = data.MyDataset(DF(args.baseroot,'val'), transform, use_cache=False)
 valloader = DataLoader(val_dataset, batch_size=1)
 
 # Current Device 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = 'cpu'
 print('Using device:', device)
 
 # Define model
@@ -54,12 +52,11 @@ with torch.no_grad():
             recon_time = time.time() - start_time
             
             # Peak Signal to Noise Ratio
-            mse = torch.mean((recon - imgC) ** 2)
-            psnr = 10 * torch.log10(1 / mse)
+            psnr = 10 * torch.log10(1 / loss.item())
 
             recon = recon.squeeze().cpu().numpy()
             imgN = imgN.squeeze().cpu().numpy()
             result = cv2.hconcat((imgN, recon))
             # result = recon
             cv2.imwrite(args.output_path + 'img_' + str(i) + '.jpg', (result*255).astype('uint8'))
-            print('Loss: {:.4f}, PSNR: {:,.2f}, time: {:,.2f}'.format(loss.item(), psnr, recon_time))
+            print('Loss: {:.2E}, PSNR: {:,.2f}, time: {:,.2f}'.format(Decimal(loss.item()), psnr, recon_time))

@@ -7,11 +7,11 @@ def DF(baseroot, type):
     # clean
     dfC = pd.DataFrame()
     if type == 'train': 
-        dfC['pClean'] = glob.glob(baseroot + "train_clean/*.png")
+        dfC['pClean'] = glob.glob(baseroot + "train/clean/*.png")
     elif type == 'test':
-        dfC['pClean'] = glob.glob(baseroot + "test_clean/*.png")
+        dfC['pClean'] = glob.glob(baseroot + "test/clean/*.png")
     elif type == 'val':
-        dfC['pClean'] = glob.glob(baseroot + "val_clean/*.png")
+        dfC['pClean'] = glob.glob(baseroot + "val/clean/*.png")
     dfC['idC'] = [p.split(os.path.sep)[-1][-8:-4] for p in dfC['pClean']]
     dfC = dfC.sort_values(by=['idC'],ascending=[True])
     dfC.reset_index(inplace=True, drop=True)
@@ -20,11 +20,11 @@ def DF(baseroot, type):
     # Noisy
     dfN = pd.DataFrame()
     if type == 'train': 
-        dfN['pNoisy'] = glob.glob(baseroot + "train_noisy/*.png")
+        dfN['pNoisy'] = glob.glob(baseroot + "train/noisy/*.png")
     elif type == 'test':
-        dfN['pNoisy'] = glob.glob(baseroot + "test_noisy/*.png")
+        dfN['pNoisy'] = glob.glob(baseroot + "test/noisy/*.png")
     elif type == 'val':
-        dfN['pNoisy'] = glob.glob(baseroot + "val_noisy/*.png")
+        dfN['pNoisy'] = glob.glob(baseroot + "val/noisy/*.png")
     dfN['idN'] = [p.split(os.path.sep)[-1][-8:-4] for p in dfN['pNoisy']]
     dfN = dfN.sort_values(by=['idN'],ascending=[True])
     dfN.reset_index(inplace=True, drop=True)

@@ -5,20 +5,42 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "data",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/utils/createData.py",
+            // "args": [
+            //     "-i",
+            //     "/home/adguerrero/ia_nas/datasets/autoencoder/dataset/datos_andres/",
+            //     "-o",
+            //     "/home/adguerrero/ia_nas/datasets/autoencoder/dataset/datos_andres/crop/",
+            //     "-f",
+            //     "4401-1.png"
+            // ],
+        },
+        {
             "name": "main",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/main.py",
-            "args": ["-r", "/home/adguerrero/ia_nas/datasets/autoencoder/dataset/",
-                    "-o", "./models/"],
+            "args": [
+                "-r",
+                "/home/adguerrero/ia_nas/datasets/autoencoder/dataset/",
+                "-o",
+                "./models/"
+            ],
         },
         {
             "name": "Evaluar",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/valmodel.py",
-            "args": ["-r", "/home/adguerrero/ia_nas/datasets/autoencoder/dataset/",
-                    "-o", "./results/"],
+            "args": [
+                "-r",
+                "/home/adguerrero/ia_nas/datasets/autoencoder/dataset/",
+                "-o",
+                "./results/"
+            ],
         }
     ]
 }
