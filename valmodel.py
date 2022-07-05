@@ -7,6 +7,7 @@ from model import Autoencoder
 from utils import data
 from utils.dataframe import DF 
 
+from itertools import product
 from decimal import Decimal
 import argparse
 import time
@@ -23,12 +24,13 @@ parser.add_argument('-o', '--output_path', required=False,
 args = parser.parse_args()
 
 # Load data 
+batch_size = 1
 transform = transforms.Compose([
             transforms.Grayscale(num_output_channels=1),
-            transforms.ToTensor(),
+            transforms.ToTensor()
             ])
 val_dataset = data.MyDataset(DF(args.baseroot,'val'), transform, use_cache=False)
-valloader = DataLoader(val_dataset, batch_size=1)
+valloader = DataLoader(val_dataset, batch_size=batch_size)
 
 # Current Device 
 device = 'cpu'
@@ -42,21 +44,32 @@ checkpoint = torch.load(args.model)
 model.load_state_dict(checkpoint['state_dict'])
 criterion = nn.MSELoss()
 
+d_transform = transforms.Compose([
+            transforms.ToPILImage()
+            ])
 with torch.no_grad():
         model.eval()
         for i, pair in enumerate(valloader):
             start_time = time.time()
             imgC, imgN = pair[0].to(device), pair[1].to(device)
-            recon = model(imgN,device)
-            loss = criterion(recon,imgC)
+
+            d = 40 # size patch
+            w = imgN.size(2)
+            h = imgN.size(3)
+            reconT = torch.zeros(imgN.size()).to(device)
+            grid = product(range(0, h-h%d, d), range(0, w-w%d, d))
+            for i, j in grid:
+                box = (j, i, j+d, i+d)
+                recon = model(transform(d_transform(imgN.imgN.squeeze()).crop(box)).unsqueeze(0),device)
+                reconT[:,:,j:j+d,i:i+d] = recon
+            loss = criterion(reconT,imgC)
             recon_time = time.time() - start_time
             
             # Peak Signal to Noise Ratio
-            psnr = 10 * torch.log10(1 / loss.item())
+            psnr = 10 * torch.log10(torch.tensor([1]) / loss.item())
+            reconT = reconT.squeeze().numpy()
+            imgN = imgN.squeeze().numpy()
+            result = cv2.hconcat((imgN, reconT))
 
-            recon = recon.squeeze().cpu().numpy()
-            imgN = imgN.squeeze().cpu().numpy()
-            result = cv2.hconcat((imgN, recon))
-            # result = recon
             cv2.imwrite(args.output_path + 'img_' + str(i) + '.jpg', (result*255).astype('uint8'))
             print('Loss: {:.2E}, PSNR: {:,.2f}, time: {:,.2f}'.format(Decimal(loss.item()), psnr, recon_time))

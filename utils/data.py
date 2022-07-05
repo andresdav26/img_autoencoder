@@ -2,9 +2,9 @@ import torch
 from PIL import Image
 
 class MyDataset(torch.utils.data.Dataset):
-    def __init__(self, dataframe, transforms, use_cache=False):
+    def __init__(self, dataframe, transform, use_cache=False):
         self.dataframe = dataframe
-        self.transforms = transforms
+        self.transform = transform
         self.cached_data = []
         self.use_cache = use_cache
 
@@ -12,8 +12,11 @@ class MyDataset(torch.utils.data.Dataset):
         Image.MAX_IMAGE_PIXELS = None
         if not self.use_cache:
             row = self.dataframe.iloc[index] 
-            imClean = self.transforms(Image.open(row['pClean']))
-            imNoisy = self.transforms(Image.open(row['pNoisy'])) 
+            imClean = Image.open(row['pClean'])
+            imNoisy = Image.open(row['pNoisy'])
+            if self.transform: 
+                imClean = self.transform(imClean)
+                imNoisy = self.transform(imNoisy) 
             self.cached_data.append((imClean,imNoisy))
         else:
             imClean, imNoisy = self.cached_data[index]

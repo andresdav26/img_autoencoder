@@ -54,14 +54,14 @@ testloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_
 # DEFINE MODEL  
 model = Autoencoder().to(device)
 criterion = nn.MSELoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)#, weight_decay=1e-3)
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-3)
 
 tb = SummaryWriter()
 
 # MAIN LOOP 
 worst_loss = 1000
 num_epochs = 300
-# scheduler = StepLR(optimizer, step_size=30, gamma=0.1, verbose=True)
+scheduler = StepLR(optimizer, step_size=30, gamma=0.1, verbose=True)
 for epoch in range(num_epochs):
     start_time = time.time()
     if epoch == 1:
@@ -80,12 +80,11 @@ for epoch in range(num_epochs):
         recon = model(imgN,device)
         loss = criterion(recon, imgC)
         train_loss += loss.item()
-        # Peak Signal to Noise Ratio
-        train_psnr += 10 * torch.log10(torch.tensor([1]) / train_loss)
         loss.backward()
         optimizer.step()
-    train_psnr /= len(trainloader.dataset) 
-    train_loss /= len(trainloader.dataset) 
+    train_loss /= len(trainloader.dataset)
+    # Peak Signal to Noise Ratio
+    train_psnr = 10 * torch.log10(torch.tensor([1]) / train_loss) 
     epoch_time = time.time() - start_time
 
     # Test 
@@ -98,16 +97,15 @@ for epoch in range(num_epochs):
             recon = model(imgN,device)
             loss = criterion(recon,imgC)
             test_loss += loss.item()
-            # Peak Signal to Noise Ratio
-            test_psnr += 10 * torch.log10(torch.tensor([1]) / test_loss)
-        test_psnr /= len(testloader.dataset)
         test_loss /= len(testloader.dataset)
+        # Peak Signal to Noise Ratio
+        test_psnr = 10 * torch.log10(torch.tensor([1]) / test_loss)
     
-    # scheduler.step() # update lr 
+    scheduler.step() # update lr 
     
     # tensorboard 
     tb.add_scalars('Loss', {'Train loss':train_loss,'Test loss':test_loss}, epoch)
-    tb.add_scalars('PSNR', {'Train psnr':train_psnr,'Test psnr':test_psnr}, epoch)
+    tb.add_scalars('PSNR', {'Train psnr':train_psnr.item(),'Test psnr':test_psnr.item()}, epoch)
 
     # Save model 
     if worst_loss > test_loss:
@@ -116,7 +114,7 @@ for epoch in range(num_epochs):
                  'optimizer': optimizer.state_dict()}
         torch.save(state, args.output_path + 'trainmodel.pth')
 
-    print('Epoch: {}, Train loss: {:.2E}, Test loss: {:.2E}, time: {:,.2f}'.format(epoch, Decimal(train_loss), 
-            Decimal(test_loss), epoch_time))
+    print('Epoch: {}, Train loss: {:.2E}, Test loss: {:.2E}, Train_psnr: {:,.2f} , Test_psnr: {:,.2f}, time: {:,.2f}'.format(epoch, Decimal(train_loss), 
+            Decimal(test_loss), train_psnr.item(), test_psnr.item(), epoch_time))
     
 tb.close()
