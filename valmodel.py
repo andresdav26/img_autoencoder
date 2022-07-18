@@ -30,7 +30,7 @@ transform = transforms.Compose([
             transforms.ToTensor()
             ])
             
-val_dataset = data.MyDataset(DF(args.baseroot,'val'), transform, use_cache=False)
+val_dataset = data.MyDataset(DF(args.baseroot,'val'), transform, 'val', use_cache=False)
 valloader = DataLoader(val_dataset, batch_size=batch_size)
 
 # Current Device 

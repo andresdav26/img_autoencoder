@@ -20,12 +20,16 @@ def tile(src, pi, dir_in, dir_out, d):
             _, ext = os.path.splitext(filename)
             img_N = Image.open(os.path.join(dir_in, 'noisy', filename)).convert('L')
             img_C = Image.open(os.path.join(dir_in, 'clean', filename)).convert('L')
+
+            img_N = img_N.resize((1920,1920), Image.ANTIALIAS)
+            img_C = img_C.resize((1920,1920), Image.ANTIALIAS)
             w, h = img_N.size
+            print(w,h)
     
             grid = product(range(0, h-h%d, d), range(0, w-w%d, d))
             for i, j in grid:
 
-                if int(f'{i0}{i1}{i2}{i3}{i4}') <= 34744:
+                if int(f'{i0}{i1}{i2}{i3}{i4}') <= 2501:
                     tp = 'train/'
                 else: 
                     tp = 'test/'
@@ -65,4 +69,4 @@ def tile(src, pi, dir_in, dir_out, d):
 src = '/home/adguerrero/ia_nas/datasets/autoencoder/dataset/datos_andres/noisy/'
 dir_input = '/home/adguerrero/ia_nas/datasets/autoencoder/dataset/datos_andres/'
 dir_output = '/home/adguerrero/ia_nas/datasets/autoencoder/dataset/datos_andres/crop/'
-tile(src,[0,0,0,0,0], dir_input, dir_output, 40)
+tile(src,[0,0,0,0,0], dir_input, dir_output, 128)
