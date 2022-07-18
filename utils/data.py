@@ -22,13 +22,14 @@ class MyDataset(torch.utils.data.Dataset):
             
             ## patches #####################################################################
             if self.eval:
-                patchC = imClean.unfold(1, 128, 128).unfold(2, 128, 128)
-                patchN = imNoisy.unfold(1, 128, 128).unfold(2, 128, 128)
+                size_patch = 128
+                # patchC = imClean.unfold(1, size_patch, size_patch).unfold(2, size_patch, size_patch)
+                patchN = imNoisy.unfold(1, size_patch, size_patch).unfold(2, size_patch, size_patch)
                 # imClean = imClean.resize_(imClean.shape[1]+imClean.shape[2],1,128,128)
                 # imNoisy = imNoisy.resize_(imNoisy.shape[1]+imNoisy.shape[2],1,128,128)
-                for i in range(patchC.shape[1]): 
-                    for j in range(patchC.shape[2]):
-                        imClean = patchC[:,i,j,:,:]
+                for i in range(patchN.shape[1]): 
+                    for j in range(patchN.shape[2]):
+                        # imClean = patchC[:,i,j,:,:]
                         imNoisy = patchN[:,i,j,:,:] 
                         self.cached_data.append((imClean,imNoisy))
                 return self.cached_data

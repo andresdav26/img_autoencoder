@@ -37,7 +37,7 @@
             "program": "${workspaceFolder}/valmodel.py",
             "args": [
                 "-m",
-                "./models/trainmodel.pth",
+                "./models/trainmodel_80_20.pth",
                 "-r",
                 "/home/adguerrero/ia_nas/datasets/autoencoder/dataset/datos_andres/crop/",
                 "-o",
