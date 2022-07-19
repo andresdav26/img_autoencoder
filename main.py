@@ -36,12 +36,10 @@ transform = {
     'train': transforms.Compose([
             transforms.Grayscale(num_output_channels=1),
             transforms.RandomHorizontalFlip(),
-            transforms.Resize((80,80)),
             transforms.ToTensor(),
             ]),
     'test': transforms.Compose([
             transforms.Grayscale(num_output_channels=1),
-            transforms.Resize((80,80)),
             transforms.ToTensor(),
             ])}
 
@@ -56,7 +54,7 @@ testloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_
 # DEFINE MODEL  
 model = Autoencoder().to(device)
 criterion = nn.MSELoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=1e-3) #weight_decay=1e-3)
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)#, weight_decay=1e-3)
 
 tb = SummaryWriter()
 
@@ -114,7 +112,7 @@ for epoch in range(num_epochs):
         worst_loss = test_loss
         state = {'epoch': epoch, 'state_dict': model.state_dict(),
                  'optimizer': optimizer.state_dict()}
-        torch.save(state, args.output_path + 'trainmodel_80_20_sin_DP_WD.pth')
+        torch.save(state, args.output_path + 'trainmodel_80_20_4032.pth')
 
     print('Epoch: {}, Train loss: {:.2E}, Test loss: {:.2E}, Train_psnr: {:,.2f} , Test_psnr: {:,.2f}, time: {:,.2f}'.format(epoch, Decimal(train_loss), 
             Decimal(test_loss), train_psnr.item(), test_psnr.item(), epoch_time))
