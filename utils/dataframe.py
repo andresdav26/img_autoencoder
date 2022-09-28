@@ -7,9 +7,9 @@ def DF(baseroot, type):
     # clean
     dfC = pd.DataFrame()
     if type == 'train': 
-        dfC['pClean'] = glob.glob(baseroot + "train/clean/*.png")
+        dfC['pClean'] = glob.glob(baseroot + "train5/clean/*.png")
     elif type == 'test':
-        dfC['pClean'] = glob.glob(baseroot + "test/clean/*.png")
+        dfC['pClean'] = glob.glob(baseroot + "test5/clean/*.png")
     elif type == 'val':
         dfC['pClean'] = glob.glob(baseroot + "val/clean/*.png")
     dfC['idC'] = [p.split(os.path.sep)[-1][-8:-4] for p in dfC['pClean']]
@@ -20,9 +20,9 @@ def DF(baseroot, type):
     # Noisy
     dfN = pd.DataFrame()
     if type == 'train': 
-        dfN['pNoisy'] = glob.glob(baseroot + "train/noisy/*.png")
+        dfN['pNoisy'] = glob.glob(baseroot + "train5/noisy/*.png")
     elif type == 'test':
-        dfN['pNoisy'] = glob.glob(baseroot + "test/noisy/*.png")
+        dfN['pNoisy'] = glob.glob(baseroot + "test5/noisy/*.png")
     elif type == 'val':
         dfN['pNoisy'] = glob.glob(baseroot + "val/noisy/*.png")
     dfN['idN'] = [p.split(os.path.sep)[-1][-8:-4] for p in dfN['pNoisy']]

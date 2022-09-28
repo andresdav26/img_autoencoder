@@ -1,12 +1,11 @@
 import torch
 import torch.nn as nn
 from torchvision import transforms
-from torch.utils.data import DataLoader
 
 from model import Autoencoder 
-from utils import data
-from utils.dataframe import DF 
+from utils.padding import padd
 
+from pathlib import Path 
 from PIL import Image
 from decimal import Decimal
 import argparse
@@ -18,16 +17,23 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-m', '--model', required=True,
                     help='path to model')
 parser.add_argument('-r', '--baseroot', required=True,
-                    help='path to val data (images)')
+                    help='path to noisy image')
+parser.add_argument('-c', '--clean_path', required=False,
+                    help='path to clean image')
 parser.add_argument('-o', '--output_path', required=False,
                     help='path where model files and training information will be placed')
 args = parser.parse_args()
 
+
+src_folder = Path(args.baseroot)
+img_paths = [path for path in src_folder.glob('*') if path.suffix in ('.png', '.jpg', '.jpeg')]
+
 # Load data 
 batch_size = 1
 transform = transforms.Compose([
-            transforms.Grayscale(num_output_channels=1),
-            transforms.Resize((1920,1920)),
+            # transforms.Grayscale(num_output_channels=1),
+            # transforms.Resize((1920,1920)),
+            # transforms.GaussianBlur(5),
             transforms.ToTensor()
             ])
             
@@ -43,29 +49,35 @@ checkpoint = torch.load(args.model)
 model.load_state_dict(checkpoint['state_dict'])
 criterion = nn.MSELoss()
 d = 80 # size patch 
-i = 0
-j = 0
-reconT = torch.zeros(1,1,1920,1920).to(device) 
-with torch.no_grad():
-        model.eval()
-        start_time = time.time()
-        imClean = transform(Image.open(args.baseroot + "clean/4401-16.png")).to(device)
-        imNoisy = transform(Image.open(args.baseroot + "noisy/4401-16.png")).to(device)
-        # patches 
-        patchN = imNoisy.unfold(1, d, d).unfold(2, d, d)
-
-        for i in range(patchN.shape[1]): 
-            for j in range(patchN.shape[2]):
-                imgN_p = patchN[:,i,j,:,:].unsqueeze(0)
-                recon = model(imgN_p,device)
-                reconT[:,:,i*d:(i+1)*d,j*d:(j+1)*d] = recon
-        # Metrics 
-        loss = criterion(reconT,imClean.unsqueeze(0))
-        psnr = 10 * torch.log10(torch.tensor([1]) / loss.item())
-        reconT = reconT.squeeze().cpu().numpy()    
-        imNoisy = imNoisy.squeeze().cpu().numpy()
-        result = cv2.hconcat((imNoisy, reconT))
-        recon_time = time.time() - start_time
-            
-        cv2.imwrite(args.output_path + 'img_' + '.jpg', (result*255).astype('uint8'))
-        print('Loss: {:.2E}, PSNR: {:,.2f}, time: {:,.2f}'.format(Decimal(loss.item()), psnr.item(), recon_time))
+for img_path in img_paths:
+    with torch.no_grad():
+            model.eval()
+            start_time = time.time()
+            imNoisy = transform(Image.open(img_path).convert('1')).to(device)
+            imNoisy_padd, r, c, padr, padc = padd(imNoisy,d) # padding
+            patchN = imNoisy_padd.unfold(1, d, d).unfold(2, d, d)
+            reconT = torch.zeros(1,1,r+padr,c+padc).to(device) 
+            for i in range(patchN.shape[1]): 
+                for j in range(patchN.shape[2]):
+                    imgN_p = patchN[:,i,j,:,:].unsqueeze(0)
+                    recon = model(imgN_p,device)
+                    reconT[:,:,i*d:(i+1)*d,j*d:(j+1)*d] = recon 
+            recon_time = time.time() - start_time
+            reconT = reconT[:,:,0:r,0:c]
+            if args.clean_path:
+                # Metrics 
+                imClean = transform(Image.open(args.clean_path + str(img_path.name)).convert('1')).to(device)
+                loss = criterion(reconT,imClean.unsqueeze(0))
+                psnr = 10 * torch.log10(torch.tensor([1]) / loss.item())
+                
+                reconT = reconT.squeeze().cpu().numpy()   
+                imNoisy = imNoisy.squeeze().cpu().numpy()
+                result = cv2.hconcat((imNoisy, reconT))
+                cv2.imwrite(args.output_path +  str(img_path.name), (result*255).astype('uint8'))
+                print('Loss: {:.2E}, PSNR: {:,.2f}, time: {:,.2f}'.format(Decimal(loss.item()), psnr.item(), recon_time))
+            else:
+                reconT = reconT.squeeze().cpu().numpy()   
+                imNoisy = imNoisy.squeeze().cpu().numpy()
+                result = cv2.hconcat((imNoisy, reconT))
+                cv2.imwrite(args.output_path +  str(img_path.name), (reconT*255).astype('uint8'))
+                print('Time: {:,.2f}'.format(recon_time))

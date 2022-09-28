@@ -13,8 +13,8 @@ class MyDataset(torch.utils.data.Dataset):
         Image.MAX_IMAGE_PIXELS = None
         if not self.use_cache:
             row = self.dataframe.iloc[index] 
-            imClean = Image.open(row['pClean'])
-            imNoisy = Image.open(row['pNoisy'])
+            imClean = Image.open(row['pClean']).convert('1')
+            imNoisy = Image.open(row['pNoisy']).convert('1')
 
             if self.transform: 
                 imClean = self.transform(imClean)

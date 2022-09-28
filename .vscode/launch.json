@@ -37,9 +37,12 @@
             "program": "${workspaceFolder}/valmodel.py",
             "args": [
                 "-m",
-                "./models/trainmodel.pth",
+                "./models/trainmodel_6.pth",
                 "-r",
-                "/home/adguerrero/ia_nas/datasets/autoencoder/dataset/datos_andres/crop/val/",
+                // "/home/adguerrero/ia_nas/datasets/ocr_lab/rph_2/",
+                "/home/adguerrero/ia_nas/datasets/autoencoder/dataset/datos_andres/crop/val/noisy/",
+                "-c", 
+                "/home/adguerrero/ia_nas/datasets/autoencoder/dataset/datos_andres/crop/val/clean/",
                 "-o",
                 "./results/"
             ],
